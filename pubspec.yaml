@@ -1,0 +1,61 @@
+name: open_maps
+description: Open-data maps and turn-by-turn navigation built on OpenStreetMap, Overture Maps and Valhalla.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.11.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_compass: ^0.8.1
+  flutter_map: ^8.3.1
+  vector_map_tiles: ^9.0.0-beta.11
+  vector_tile_renderer: ^6.1.0
+  flutter_tts: ^4.2.5
+  geolocator: ^14.0.3
+  http: ^1.6.0
+  latlong2: ^0.10.1
+  share_plus: ^13.3.0
+  shared_preferences: ^2.5.5
+  url_launcher: ^6.3.2
+  wakelock_plus: ^1.7.0
+
+# Local copy of vector_map_tiles 9.0.0-beta.11 carrying two small fixes for
+# multi-theme layers (see packages/vector_map_tiles/PATCHES.md).
+dependency_overrides:
+  vector_map_tiles:
+    path: packages/vector_map_tiles
+  # Local copy of vector_tile_renderer 6.1.0 with unblurred text halos (see
+  # packages/vector_tile_renderer/PATCHES.md).
+  vector_tile_renderer:
+    path: packages/vector_tile_renderer
+
+dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
+  flutter_test:
+    sdk: flutter
+  fake_async: ^1.3.0
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+# Launcher icons are generated from assets/branding with
+# `dart run flutter_launcher_icons`.
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: assets/branding/icon.png
+  adaptive_icon_background: "#2563EB"
+  adaptive_icon_foreground: assets/branding/icon_foreground.png
+  web:
+    generate: true
+    image_path: assets/branding/icon.png
+    background_color: "#2563EB"
+    theme_color: "#2563EB"
+  macos:
+    generate: true
+    image_path: assets/branding/icon.png

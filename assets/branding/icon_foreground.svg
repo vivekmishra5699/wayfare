@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Android adaptive-icon foreground: the mark inside the 66% safe zone, transparent background -->
+  <g transform="translate(512 512) scale(0.62) translate(-512 -512)">
+    <path d="M300 668 C 300 500, 400 470, 500 470 C 620 470, 640 380, 704 322"
+          fill="none" stroke="#FFFFFF" stroke-width="58" stroke-linecap="round"/>
+    <circle cx="300" cy="740" r="60" fill="none" stroke="#FFFFFF" stroke-width="38"/>
+    <circle cx="740" cy="300" r="74" fill="#FFFFFF"/>
+  </g>
+</svg>
