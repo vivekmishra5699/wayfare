@@ -35,7 +35,8 @@ class Caches {
       required int maxSizeInBytes,
       required int maxTextCacheSize,
       required int rasterImageCacheMaxSizeInBytes,
-      required ByteStorage cacheStorage}) {
+      required ByteStorage cacheStorage,
+      TileDataTransform? tileDataTransform}) {
     _storage = cacheStorage;
     final vectorProviders = providers.tileProviderBySource.entries.where((e) =>
         e.value.type == TileProviderType.vector ||
@@ -52,7 +53,8 @@ class Caches {
         memoryTileDataCache,
         tileProviders,
         executor,
-        theme);
+        theme,
+        transform: tileDataTransform);
     textCache = TextCache(maxSize: maxTextCacheSize);
     atlasImageCache = sprites == null
         ? null

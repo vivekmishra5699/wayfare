@@ -7,6 +7,7 @@ import 'grid/grid_layer.dart';
 import 'io/io.dart';
 import 'options.dart';
 import 'style/style.dart';
+import 'tile_data_transform.dart';
 import 'tile_offset.dart';
 import 'tile_providers.dart';
 import 'vector_tile_controller.dart';
@@ -132,6 +133,10 @@ class VectorTileLayer extends StatelessWidget {
   /// the default [rasterImageCacheMaxSizeInBytes]
   static const defaultRasterImageCacheMaxSize = 48 * 1024 * 1024;
 
+  /// Patched (open_maps): see [TileDataTransform]. Applied to every source
+  /// tile of this layer's theme as it is decoded.
+  final TileDataTransform? tileDataTransform;
+
   /// A function that resolves a folder for filesystem caching.
   /// If unspecified, defaults to a subfolder of the temporary directory.
   /// Applications that wish to delete persistent cache data should specify
@@ -161,6 +166,7 @@ class VectorTileLayer extends StatelessWidget {
       this.rasterScale = 2.0,
       this.rasterImageCacheMaxSizeInBytes = defaultRasterImageCacheMaxSize,
       this.tileDelay = const Duration(milliseconds: 0),
+      this.tileDataTransform,
       this.cacheFolder}) {
     assert(concurrency >= 0 && concurrency <= 100);
     final providers = theme.tileSources

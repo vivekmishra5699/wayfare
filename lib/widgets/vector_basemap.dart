@@ -9,6 +9,7 @@ import 'package:vector_tile_renderer/vector_tile_renderer.dart';
 import '../services/api_client.dart';
 import '../services/app_exception.dart';
 import '../services/basemap_style.dart';
+import '../services/boundary_policy.dart';
 import '../services/pmtiles_provider.dart';
 import '../services/render_quality.dart';
 
@@ -216,8 +217,7 @@ class VectorBasemap {
 
   /// Tile-decoding isolates. Pre-rendered mode used to run with half of
   /// them; the worker count only needs trimming on genuinely weak hardware.
-  static int get _concurrency =>
-      RenderQualitySettings.isLowEndDevice ? 2 : 4;
+  static int get _concurrency => RenderQualitySettings.isLowEndDevice ? 2 : 4;
 
   static final _overlayByBase = <String, Style>{};
   static final _backgroundByBase = <String, Theme>{};
@@ -279,7 +279,8 @@ class VectorBasemap {
     final dpr = MediaQuery.devicePixelRatioOf(context);
     final tilePx = 256 * dpr;
     final tileLogical = 256 * 0.71;
-    final tilesPerLevel = (size.width / tileLogical + 1).ceil() *
+    final tilesPerLevel =
+        (size.width / tileLogical + 1).ceil() *
         (size.height / tileLogical + 1).ceil();
     final bytesPerLevel = tilesPerLevel * tilePx * tilePx * 4;
     return (2 * bytesPerLevel).round().clamp(48 << 20, 128 << 20);
@@ -319,6 +320,10 @@ class VectorBasemap {
     tileProviders: style.providers,
     theme: _part(style, part),
     sprites: style.sprites,
+    // International boundaries as India depicts them; see boundary_policy.
+    tileDataTransform: switch (kBoundaryWorldview) {
+      BoundaryWorldview.india => indiaBoundaryPolicy,
+    },
     // Raster mode paints each tile once to a bitmap in an isolate and
     // lets the GPU scale it; vector mode redraws at every fractional
     // zoom (crisper, but too much for weak CPUs).

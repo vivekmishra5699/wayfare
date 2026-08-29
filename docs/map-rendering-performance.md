@@ -418,6 +418,23 @@ Directions → Start → 40 drags along the route, memory sampled every 3 s):
 - `picture.dispose()` after `toImage` (native heap 300 → 165 MB after the run) and
   the memory-pressure observer is now actually registered.
 
+App (2026-08-29) — "scrolling is a little laggy" in browse and navigation:
+- Scripted pans in both modes measured *clean* — UI 2–3 ms, raster 3–4 ms, 0–2 %
+  of frames over budget — yet FRAMESTATS windows held ~120 frames per 2 s: the
+  app was rendering at 60 fps on a 120 Hz panel (`peak_refresh_rate=120`,
+  active mode 60). Android runs content that doesn't declare a frame rate at
+  the "normal" category (60 Hz), so the map scrolled at half the rate of every
+  other app on the phone — perceived as lag despite perfect frame times.
+- `MainActivity.kt` now votes for the fastest display mode at the current
+  resolution (`preferredDisplayModeId`). The system still arbitrates: the
+  user's screen setting, battery saver and thermals can clamp it, and LTPO
+  panels still idle low. After: ~240 frames per 2 s window during pans
+  (browse *and* navigation), UI 2 ms / raster 3–4 ms, 0–6 % of frames over
+  the stricter 8.3 ms budget; 16-tap zoom burst 3 %, zero re-renders (bitmap
+  cache), PSS and graphics memory flat at idle.
+- `lib/main.dart` — FRAMESTATS now derives its per-thread jank budget from the
+  display's actual refresh rate instead of assuming 16.7 ms, and prints it.
+
 Dev flags: `OM_FRAMESTATS`, `OM_TILESTATS`, `OM_RASTER_CACHE`, plus the pre-existing
 `OM_CENTER`, `OM_ZOOM`, `OM_QUALITY`. (In zsh pass several `--dart-define`s as an array —
 an unquoted `$D` string is passed as one mangled define and silently disables them all.)

@@ -96,6 +96,19 @@ on the build.
     group opacity directly, so every fading tile was a saveLayer (Impeller has
     no raster cache to absorb it); labels now pop in, as Organic Maps' do.
 
+11. `lib/src/tile_data_transform.dart` (new), `vector_tile_layer.dart`,
+    `options.dart`, `cache/caches.dart`, `cache/vector_tile_loading_cache.dart`,
+    `grid/grid_layer.dart`: an optional `tileDataTransform` on
+    `VectorTileLayer` — a top-level function applied to each decoded source
+    tile inside the decoding isolates, before it enters the parsed-tile
+    cache. It receives the source tile's `TileIdentity` so tile-local
+    geometry can be placed on the globe. The app uses it to draw international
+    boundaries according to a worldview (`lib/services/boundary_policy.dart`):
+    it drops, cuts and re-tags features, adds line features built from
+    lon/lat (`TileLine`, see the vector_tile_renderer patch 2), and adds a
+    `boundary` layer to source tiles that have none. Changing the transform
+    recreates the caches.
+
 Dev-only timing prints: `--dart-define=OM_TILESTATS=true` logs per-tile
 `TILEDATA` (fetch/parse), `TILESTATS` (render) and `TILECACHE` (bitmap
 cache hit) lines.

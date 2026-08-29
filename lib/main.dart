@@ -36,15 +36,25 @@ void _installFrameStats() {
       final s = [...v]..sort();
       return s[((s.length - 1) * q).round()];
     }
+
     int avg(List<int> v) => v.reduce((a, b) => a + b) ~/ v.length;
+    // Per-thread budget at the display's actual refresh rate (the UI and
+    // raster threads pipeline, so each has a full vsync period).
+    final refresh = WidgetsBinding
+        .instance.platformDispatcher.displays.firstOrNull?.refreshRate;
+    final budget =
+        1000000 ~/ ((refresh == null || refresh < 30) ? 60 : refresh.round());
     var janky = 0;
     for (var i = 0; i < ui.length; i++) {
-      if (ui[i] + raster[i] > 16700) janky++;
+      if (ui[i] > budget || raster[i] > budget) janky++;
     }
     // ignore: avoid_print
-    print('FRAMESTATS n=${ui.length} ui avg=${avg(ui) ~/ 1000}ms p90=${p(ui, 0.9) ~/ 1000}ms '
-        'raster avg=${avg(raster) ~/ 1000}ms p90=${p(raster, 0.9) ~/ 1000}ms '
-        'janky=$janky (${(100 * janky / ui.length).round()}%)');
+    print(
+      'FRAMESTATS n=${ui.length} budget=${budget ~/ 100 / 10}ms '
+      'ui avg=${avg(ui) ~/ 1000}ms p90=${p(ui, 0.9) ~/ 1000}ms '
+      'raster avg=${avg(raster) ~/ 1000}ms p90=${p(raster, 0.9) ~/ 1000}ms '
+      'janky=$janky (${(100 * janky / ui.length).round()}%)',
+    );
     ui.clear();
     raster.clear();
     windowStart = now;

@@ -34,10 +34,7 @@ Map<String, dynamic> englishLabelsStyleJson(Map<String, dynamic> style) {
     final layout = layer['layout'];
     final field = layout is Map ? layout['text-field'] : null;
     if (field != null && _readsName(field)) {
-      layer['layout'] = {
-        ...layout as Map,
-        'text-field': englishNameExpression,
-      };
+      layer['layout'] = {...layout as Map, 'text-field': englishNameExpression};
     }
     layers.add(layer);
   }

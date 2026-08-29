@@ -9,6 +9,7 @@ import '../extensions.dart';
 import '../grid/constants.dart';
 import '../grid/slippy_map_translator.dart';
 import '../provider_exception.dart';
+import '../tile_data_transform.dart';
 import '../tile_identity.dart';
 import '../tile_providers.dart';
 import '../vector_tile_provider.dart';
@@ -29,8 +30,12 @@ class VectorTileLoadingCache {
   final _readyCompleter = Completer<bool>();
   late final int maximumZoom;
 
+  final TileDataTransform? _transform;
+
   VectorTileLoadingCache(this._delegate, this._memoryCache, this._tileDataCache,
-      this._providers, this._executor, this._theme) {
+      this._providers, this._executor, this._theme,
+      {TileDataTransform? transform})
+      : _transform = transform {
     maximumZoom = _providers.tileProviderBySource.values
         .map((e) => e.maximumZoom)
         .reduce(max);
@@ -73,6 +78,7 @@ class VectorTileLoadingCache {
     var loaded = false;
     TileTranslation? translation;
     var dataKey = tileKey;
+    var dataTile = tile;
     if (future == null) {
       final provider = _providers.tileProviderBySource[source];
       if (provider == null || tile.z < provider.minimumZoom) {
@@ -91,6 +97,7 @@ class VectorTileLoadingCache {
         tileToLoad = translation.translated;
         dataKey = _toKey(source, tileToLoad);
       }
+      dataTile = tileToLoad;
       loaded = true;
       future = _loadBytes(provider, dataKey, tileToLoad, cachedOnly);
       if (cachedOnly) {
@@ -129,8 +136,10 @@ class VectorTileLoadingCache {
             source: source,
             themeId: _theme.id,
             dataKey: dataKey,
+            tile: dataTile,
             bytes: bytes,
-            translation: translation),
+            translation: translation,
+            transform: _transform),
         cancelled: cancelled,
         deduplicationKey: name));
     _tileDataCache.put(tileKey, tileData);
@@ -161,15 +170,19 @@ class _ThemeTile {
   final String source;
   final String themeId;
   final String dataKey;
+  final TileIdentity tile;
   final Uint8List bytes;
   final TileTranslation? translation;
+  final TileDataTransform? transform;
 
   _ThemeTile(
       {required this.source,
       required this.themeId,
       required this.dataKey,
+      required this.tile,
       required this.bytes,
-      required this.translation});
+      required this.translation,
+      required this.transform});
 }
 
 /// Patched (open_maps): parsed source tiles, per isolate. Above the
@@ -182,10 +195,17 @@ final _parsedBySourceKey = <String, TileData>{};
 const _parsedCacheSize = 4;
 
 TileData _parse(_ThemeTile themeTile) {
-  final key = '${themeTile.dataKey}/${themeTile.themeId}';
+  final transform = themeTile.transform;
+  final key =
+      '${themeTile.dataKey}/${themeTile.themeId}/${transform == null ? 0 : 1}';
   var parsed = _parsedBySourceKey.remove(key);
-  parsed ??= TileFactory(_themeById[themeTile.themeId]!, const Logger.noop())
-      .createTileData(VectorTileReader().read(themeTile.bytes));
+  if (parsed == null) {
+    parsed = TileFactory(_themeById[themeTile.themeId]!, const Logger.noop())
+        .createTileData(VectorTileReader().read(themeTile.bytes));
+    if (transform != null) {
+      parsed = transform(themeTile.tile, themeTile.source, parsed);
+    }
+  }
   _parsedBySourceKey[key] = parsed;
   while (_parsedBySourceKey.length > _parsedCacheSize) {
     _parsedBySourceKey.remove(_parsedBySourceKey.keys.first);

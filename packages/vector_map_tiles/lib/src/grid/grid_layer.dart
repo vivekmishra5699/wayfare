@@ -234,7 +234,8 @@ class _VectorTileCompositeLayerState extends State<VectorTileCompositeLayer>
         maxTextCacheSize: widget.options.textCacheMaxSize,
         rasterImageCacheMaxSizeInBytes:
             widget.options.rasterImageCacheMaxSizeInBytes,
-        cacheStorage: createByteStorage(widget.options.cacheFolder));
+        cacheStorage: createByteStorage(widget.options.cacheFolder),
+        tileDataTransform: widget.options.tileDataTransform);
     _tileSupplier = DelayProvider(
             CachesTileProvider(
                 _caches,

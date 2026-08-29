@@ -11,8 +11,17 @@ void main() {
             'text-field': [
               'case',
               ['has', 'name:nonlatin'],
-              ['concat', ['get', 'name:latin'], '\n', ['get', 'name:nonlatin']],
-              ['coalesce', ['get', 'name_en'], ['get', 'name']],
+              [
+                'concat',
+                ['get', 'name:latin'],
+                '\n',
+                ['get', 'name:nonlatin'],
+              ],
+              [
+                'coalesce',
+                ['get', 'name_en'],
+                ['get', 'name'],
+              ],
             ],
             'text-size': 12,
           },
@@ -24,7 +33,10 @@ void main() {
         {
           'id': 'ref',
           'layout': {
-            'text-field': ['to-string', ['get', 'ref']],
+            'text-field': [
+              'to-string',
+              ['get', 'ref'],
+            ],
           },
         },
         {'id': 'fill', 'paint': <String, dynamic>{}},
@@ -37,7 +49,10 @@ void main() {
     expect(layout(0)['text-field'], englishNameExpression);
     expect(layout(0)['text-size'], 12);
     expect(layout(1)['text-field'], englishNameExpression);
-    expect(layout(2)['text-field'], ['to-string', ['get', 'ref']]);
+    expect(layout(2)['text-field'], [
+      'to-string',
+      ['get', 'ref'],
+    ]);
     expect(layers[3].containsKey('layout'), isFalse);
     // Input is not mutated.
     final original = (style['layers'] as List<Map<String, dynamic>>)[0];

@@ -11,3 +11,8 @@
 
 Also removed from this vendored copy (not patches): `example/`, `test/`,
 `test_data/` and the README image.
+
+2. `lib/vector_tile_renderer.dart`: export `src/model/geometry_model.dart`
+   (`TileLine`, `TilePoint`) so a `TileDataTransform` (see
+   `packages/vector_map_tiles/PATCHES.md` 11) can build line features from
+   points instead of MVT command integers.

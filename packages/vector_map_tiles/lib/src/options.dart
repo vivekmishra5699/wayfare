@@ -2,6 +2,7 @@ import 'package:vector_tile_renderer/vector_tile_renderer.dart';
 
 import 'io/io.dart';
 import 'style/style.dart';
+import 'tile_data_transform.dart';
 import 'tile_offset.dart';
 import 'tile_providers.dart';
 import 'vector_tile_controller.dart';
@@ -29,6 +30,7 @@ class VectorTileLayerOptions {
   final double? maximumZoom;
   final double rasterScale;
   final int rasterImageCacheMaxSizeInBytes;
+  final TileDataTransform? tileDataTransform;
   final Future<Directory> Function()? cacheFolder;
 
   VectorTileLayerOptions(vmt.VectorTileLayer layer)
@@ -53,6 +55,7 @@ class VectorTileLayerOptions {
         maximumZoom = layer.maximumZoom,
         rasterScale = layer.rasterScale,
         rasterImageCacheMaxSizeInBytes = layer.rasterImageCacheMaxSizeInBytes,
+        tileDataTransform = layer.tileDataTransform,
         cacheFolder = layer.cacheFolder;
 
   bool hasRenderDifferences(VectorTileLayerOptions other) =>
@@ -65,5 +68,6 @@ class VectorTileLayerOptions {
       other.tileOffset != tileOffset ||
       other.layerMode != layerMode ||
       other.maximumZoom != maximumZoom ||
-      other.rasterScale != rasterScale;
+      other.rasterScale != rasterScale ||
+      other.tileDataTransform != tileDataTransform;
 }

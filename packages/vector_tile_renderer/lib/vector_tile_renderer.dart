@@ -5,6 +5,7 @@ export 'package:vector_tile/vector_tile.dart' show VectorTile;
 export 'src/image_renderer.dart';
 export 'src/image_to_png.dart';
 export 'src/logger.dart';
+export 'src/model/geometry_model.dart';
 export 'src/model/tile_data_model.dart';
 export 'src/model/tile_factory.dart';
 export 'src/model/tile_model.dart';
